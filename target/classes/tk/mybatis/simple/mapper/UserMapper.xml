@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="tk.mybatis.simple.mapper.UserMapper">
+
+	<resultMap id="userMap" type="SysUser">
+		<id property="id" column="id" />
+		<result property="userName" column="user_name" />
+		<result property="userPassword" column="user_password" />
+		<result property="userEmail" column="user_email" />
+		<result property="userInfo" column="user_info" />
+		<result property="headImg" column="head_img" jdbcType="BLOB" />
+		<result property="createTime" column="create_time"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<!-- Please try to remove property fectchType and check the program log -->
+	<resultMap id="userRoleMapSelect" extends="userMap" type="SysUser">
+		<association 
+			property="role" 
+			column="{id=role_id}"
+			fetchType="lazy"
+			select="tk.mybatis.simple.mapper.RoleMapper.selectRoleById">
+		</association>
+	</resultMap>
+	
+	
+	<select id="selectUserAndRoleByIdSelect" resultMap="userRoleMapSelect">
+		select 
+			u.id,
+			u.user_name,
+			u.user_email,
+			u.user_info,
+			u.head_img,
+			u.create_time,
+			ur.role_id
+		from sys_user u
+		inner join  sys_user_role ur on u.id = ur.user_id
+		where u.id = #{id}
+	</select>
+
+</mapper>
